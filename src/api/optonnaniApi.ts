@@ -4,8 +4,6 @@ import { handleGptResponse } from "../services/gptService";
 import { constants } from "../util/constants";
 import { isTruthy } from "../util/util";
 
-const promptArr: IPrompt[] = [];
-
 /**
  * Starts the Optonnani Service.
  */
@@ -27,11 +25,11 @@ export const runOptonnaniApi = () => {
     });
 
     /**
-     * POST for /optonnani
+     * POST for /optonnani/question
      */
-    app.post('/optonnani', async (req: any, res: any) => {
+    app.post('/optonnani/question', async (req: any, res: any) => {
         res.setHeader('Access-Control-Allow-Origin', constants.FRONTEND_URL);
-        console.info("\nPOST for /optonnani got called");
+        console.info("\nPOST for /optonnani/question got called");
         const data = req.body;
 
         if (!isTruthy(data)) {
@@ -44,10 +42,41 @@ export const runOptonnaniApi = () => {
             return;
         }
 
-        promptArr.push({
-            userId: "Frontend",
-            text: data.message,
-        });
+        let gptResponse = await handleGptResponse(data.message)
+            .catch((err) => {
+                console.error("Error handling GPT Response: ", err);
+            });
+
+        console.log("Received data:", data);
+        console.log("Returning:", gptResponse.data.choices[0].text);
+
+        res.status(201)
+            .send({
+                data: { 
+                    id: 1, 
+                    data: gptResponse.data.choices[0].text.replace("\n", ""),
+                },
+                message: "success",
+            });
+    });
+
+    /**
+     * POST for /optonnani/statement
+     */
+    app.post('/optonnani/statement', async (req: any, res: any) => {
+        res.setHeader('Access-Control-Allow-Origin', constants.FRONTEND_URL);
+        console.info("\nPOST for /optonnani/statement got called");
+        const data = req.body;
+
+        if (!isTruthy(data)) {
+            console.error("/optonnani POST: falsy data received. Returning bad request.");
+            res.status(400)
+                .send({
+                    data: null,
+                    message: 'Bad Request',
+                });
+            return;
+        }
 
         let gptResponse = await handleGptResponse(data.message)
             .catch((err) => {
@@ -55,7 +84,6 @@ export const runOptonnaniApi = () => {
             });
 
         console.log("Received data:", data);
-        console.log("PromptArr:", promptArr);
         console.log("Returning:", gptResponse.data.choices[0].text);
 
         res.status(201)

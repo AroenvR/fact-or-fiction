@@ -7,6 +7,6 @@ import { constants } from "../util/constants";
 
 app.options('*', cors());
 app.use(express.json());
-app.listen(constants.PORT, () => console.log(`App running on: http://localhost:${constants.PORT}/`));
+app.listen(constants.PORT, () => console.log(`App running at: http://localhost:${constants.PORT}/`));
 
 export default app;
