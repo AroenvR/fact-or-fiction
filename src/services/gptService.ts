@@ -11,7 +11,7 @@ const openai: any = new OpenAIApi(configuration);
  * @param prompt string to query the AI with.
  * @returns a response from OpenAI in "" format.
  */
-export const handleGptResponse = async (prompt: string): Promise<any> => {
+export const handleGptResponse = async (prompt: string): Promise<any | IErrorResponse> => {
     return await openai.createCompletion({
         model: "text-davinci-003",
         prompt: prompt,
@@ -22,7 +22,7 @@ export const handleGptResponse = async (prompt: string): Promise<any> => {
         presence_penalty: 0.6,
     })
     .catch((err: any) => {
-        return handleGptResponseError(err);
+        throw handleGptResponseError(err);
     });
 }
 
@@ -33,20 +33,23 @@ export const handleGptResponse = async (prompt: string): Promise<any> => {
  */
 const handleGptResponseError = (err: any): IErrorResponse => {
     // Check for different types of errors and return appropriate status codes and messages
-    switch (err.constructor) {
-        case openai.errors.BadRequestError:
-          return { status: 400, error: "Bad request: Invalid input parameters or invalid request format." };
+    switch (err.response.status) {
+        case 400:
+          return { status: 400, message: "Bad request: Invalid input parameters or invalid request format." };
 
-        case openai.errors.ForbiddenError:
-          return { status: 403, error: "Forbidden: Incorrect API key or insufficient permissions." };
+        case 403:
+          return { status: 403, message: "Forbidden: Incorrect API key or insufficient permissions." };
 
-        case openai.errors.TooManyRequestsError:
-          return { status: 429, error: "Too many requests: Rate limit exceeded." };
+        case 429:
+          return { status: 429, message: "Too many requests: Rate limit exceeded." };
 
-        case openai.errors.InternalServerError:
-          return { status: 500, error: "Internal server error: An unexpected error occurred on the server." };
+        case 500:
+          return { status: 500, message: "Internal server error: An unexpected error occurred on the server." };
+
+        case 503:
+            return { status: 503, message: "Service unavailable: The OpenAI server is currently unavailable." };
 
         default:
-          return { status: 500, error: "Unknown error." };
+          return { status: 500, message: "Unknown error." };
     }
 }
