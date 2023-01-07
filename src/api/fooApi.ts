@@ -6,14 +6,14 @@ import { isTruthy } from "../util/util";
  * Starts the Foo Service.
  */
 export const runFooApi = () => {
+    console.log("/foo is listening");
 
     /**
      * GET for /foo
      */
     app.get('/foo', (req: any, res: any) => {
         res.setHeader('Access-Control-Allow-Origin', constants.FRONTEND_URL);
-    
-        console.log("GET for /foo got called");
+        console.info("\nGET for /foo got called");
     
         res.status(200)
             .send({
@@ -39,6 +39,7 @@ export const runFooApi = () => {
             return;
         }
 
+        console.log(data);
 
         res.status(201)
             .send({

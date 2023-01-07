@@ -2,10 +2,10 @@
   "name": "fact-or-fiction",
   "version": "0.1.0",
   "description": "A card game that tests your knowledge of facts and your ability to spot fake news.",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "npx nodemon"
   },
   "repository": {
     "type": "git",
