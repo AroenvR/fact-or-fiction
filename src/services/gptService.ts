@@ -13,11 +13,11 @@ const openai: any = new OpenAIApi(configuration);
  */
 export const handleGptResponse = async (prompt: string): Promise<any | IErrorResponse> => {
     return await openai.createCompletion({
-        model: "text-davinci-003",
+        model: "text-davinci-003", // https://help.openai.com/en/articles/6643408-how-do-davinci-and-text-davinci-003-differ
         prompt: prompt,
-        max_tokens: 100,
-        temperature: 0.9,
-        top_p: 1,
+        max_tokens: 100, // 2 questions with 16 statements each (all one sentence large) = 210 tokens.
+        temperature: 0.9, // May have to lower this value.
+        // top_p: 1, // Best not alter this if temperature is altered.
         frequency_penalty: 0,
         presence_penalty: 0.6,
     })
